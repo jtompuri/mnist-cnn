@@ -1,5 +1,12 @@
 # NOTES.md — decision log (newest first)
 
+## 2026-09-27 — visualize_predictions.py gained --out-dir
+Symmetry with `evaluate.py`: grids can now be written to a custom directory, and the
+`misclassified.json` lookup uses that same directory (fallback: cwd). Default behavior
+unchanged (`.`). Verified: `--out-dir /tmp/...` writes both PNGs there. Remaining
+deliberate non-features: no `--batch-size` on evaluate (one-shot, accuracy unaffected),
+no per-class reporting / TorchScript export / predict CLI (out of scope for this project).
+
 ## 2026-09-27 — CI added; train.py inline shape check removed
 Added `.github/workflows/ci.yml` (ubuntu-latest, py3.14, `pytest tests/`) so the
 pre-commit test rule is enforced automatically. Removed the inline shape/log_softmax

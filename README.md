@@ -13,7 +13,7 @@ Current best result: **99.64% test accuracy** (best val_loss 0.0141 at epoch 27/
 | `data.py` | Train/val/test loaders: 55k train / 5k val split (seed 42); light augmentation on train only |
 | `train.py` | Training loop: Adam + cosine LR, early stopping, best-checkpoint saving, curves + CSV |
 | `evaluate.py` | One-shot test evaluation; writes `confusion_matrix.png` and `misclassified.json` (or a `--out-dir`) |
-| `visualize_predictions.py` | Sample prediction grids: `correct_predictions.png`, `incorrect_predictions.png` |
+| `visualize_predictions.py` | Sample prediction grids: `correct_predictions.png`, `incorrect_predictions.png` (optional `--out-dir`) |
 | `tests/test_protocol.py` | Sanity tests: shape/log_softmax, split sizes, val determinism, checkpoint loads |
 | `tests/test_evaluation.py` | Behavior tests: loss weighting + accuracy math, seed reproducibility, checkpoint-is-trained |
 | `NOTES.md` | Decision log (protocol changes, resolved issues, rejected ideas) |
@@ -50,6 +50,8 @@ All commands from the project root:
 
 # Visualize example correct/incorrect predictions
 .venv/bin/python visualize_predictions.py
+# outputs can be redirected:
+.venv/bin/python visualize_predictions.py --out-dir results/run1
 
 # Sanity tests (shape check, split sizes, validation determinism, checkpoint loads)
 .venv/bin/python -m pytest tests/ -v

@@ -23,7 +23,9 @@ All from the project root:
 .venv/bin/python -m pytest tests/              # protocol tests (shape, splits, val determinism, checkpoint) + behavior tests (loss math, seeding, checkpoint sanity)
 ```
 `train.py` argparse (defaults in `main()`): `--epochs 30`, `--batch-size 64`, `--lr 0.0008`,
-`--seed 42`, `--patience 12`. `evaluate.py` takes optional `--out-dir`. `visualize_predictions.py` takes no arguments.
+`--seed 42`, `--patience 12`. `evaluate.py` takes optional `--out-dir`.
+`visualize_predictions.py` takes optional `--out-dir` (writes the grids there;
+reads `misclassified.json` from cwd).
 
 ## Tuning knobs
 - `NUM_WORKERS` env var (default `16`): train-loader worker count in `data.py`.
