@@ -30,6 +30,14 @@ target-version = "py312"
 select = ["E", "F", "I", "W"]
 ignore = ["E501"]
 
+[tool.setuptools]
+# This repo is a set of scripts (train/evaluate/visualize) plus a small
+# package, not a single top-level module. Disable setuptools flat-layout
+# auto-discovery so `pip install -e .` works in CI (it otherwise fails with
+# "Multiple top-level modules discovered in a flat-layout").
+py-modules = []
+packages = []
+
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
