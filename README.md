@@ -34,6 +34,7 @@ make setup          # = .venv/bin/pip install -e ".[dev]"
 ```
 
 MNIST data is downloaded automatically to `data/` on first run.
+On macOS, install the standard PyTorch wheel (MPS support); CUDA builds are Linux/Windows only.
 Training runs on CUDA when available, falling back to MPS (Apple Silicon) and then CPU;
 `train.py` prints the chosen device (e.g. `Using device: cuda`).
 Train-loader worker count is tunable via the `NUM_WORKERS` env var (default 16).
@@ -46,6 +47,7 @@ All commands from the project root — either the Makefile or the raw scripts:
 make train          # = .venv/bin/python train.py
 make eval           # = .venv/bin/python evaluate.py
 make viz            # = .venv/bin/python visualize_predictions.py
+make features       # = .venv/bin/python visualize_features.py
 make test           # = .venv/bin/python -m pytest tests/
 make check          # lint + typecheck + test
 
