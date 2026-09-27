@@ -37,7 +37,8 @@ MNIST data is downloaded automatically to `data/` on first run.
 On macOS, install the standard PyTorch wheel (MPS support); CUDA builds are Linux/Windows only.
 Training runs on CUDA when available, falling back to MPS (Apple Silicon) and then CPU;
 `train.py` prints the chosen device (e.g. `Using device: cuda`).
-Train-loader worker count is tunable via the `NUM_WORKERS` env var (default 16).
+Train-loader worker count is tunable via the `NUM_WORKERS` env var (default 16);
+all worker counts are capped at the CPU count.
 
 ## Usage
 
