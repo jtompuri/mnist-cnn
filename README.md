@@ -83,6 +83,20 @@ Outputs written to `results/` (override per-run with `--out-dir`):
 - `results/correct_predictions.png`, `results/incorrect_predictions.png` — sample grids
 - `results/conv1_filters.png`, `results/feature_maps.png` — learned feature visualizations
 
+## Sample outputs
+
+| Training curves | Confusion matrix |
+| --- | --- |
+| ![Training curves](results/training_curves.png) | ![Confusion matrix](results/confusion_matrix.png) |
+
+| Correct predictions | Incorrect predictions |
+| --- | --- |
+| ![Correct predictions](results/correct_predictions.png) | ![Incorrect predictions](results/incorrect_predictions.png) |
+
+| Conv1 kernels | Activation maps per digit |
+| --- | --- |
+| ![Conv1 kernels](results/conv1_filters.png) | ![Activation maps](results/feature_maps.png) |
+
 ## Protocol
 
 - Split: 55,000 train / 5,000 validation (seed 42); no augmentation on validation.

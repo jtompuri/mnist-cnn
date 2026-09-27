@@ -3,7 +3,7 @@
 Loads the best model (``best_model.pt``) and writes two figures to
 ``--out-dir`` (default, project root):
 
-- ``conv1_filters.png``: ``conv1``'s 32 learned 3x3 kernels as a grayscale grid.
+- ``conv1_filters.png``: ``conv1``'s 32 learned 3x3 kernels as a viridis grid.
 - ``feature_maps.png``: for one test image per digit, the activation maps after
   each of the three conv blocks (8 evenly-spaced channels sampled per block)
   plus the digit the model predicted.
@@ -77,7 +77,7 @@ def plot_conv1_filters(model: MNISTNet, out_dir: Path) -> None:
     for index, ax in enumerate(axes.flat):
         data = filters[index].astype("float64")
         normalized = (data - lower) / span
-        ax.imshow(normalized, cmap="gray", vmin=0.0, vmax=1.0)
+        ax.imshow(normalized, cmap="viridis", vmin=0.0, vmax=1.0)
         ax.set_title(f"{index}", fontsize=8)
         ax.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
     fig.suptitle(f"conv1 kernels ({filters.shape[0]}x3x3, shared vmin/vmax)", fontsize=11)
@@ -139,7 +139,7 @@ def plot_feature_maps(
             num_channels = block.shape[0]
             sample = sample_channels(num_channels, cols_per_block)
             for offset, channel in enumerate(sample):
-                show_tile(axes[digit, col_starts[block_idx] + offset], block[channel], "gray")
+                show_tile(axes[digit, col_starts[block_idx] + offset], block[channel], "magma")
 
     for block_idx, label in enumerate(BLOCK_LABELS):
         axes[0, col_starts[block_idx]].set_title(label, fontsize=8)

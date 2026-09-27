@@ -11,10 +11,10 @@
 New script `visualize_features.py` (make target: `make features`) for inspecting learned
 features, loading `best_model.pt` read-only (eval mode, `torch.no_grad`):
 - `conv1_filters.png`: conv1's 32 learned 3x3 kernels as a 4x8 grid (per-kernel
-  min/max normalization to a shared [0,1], grayscale).
+  min/max normalization to a shared [0,1], viridis).
 - `feature_maps.png`: one test image per digit 0-9 (from the un-augmented test set),
   with 8 evenly-spaced channels sampled from the output of each of the three conv
-  blocks (grayscale), plus the model's predicted digit per row.
+  blocks (magma), plus the model's predicted digit per row.
 Implementation notes: block outputs are captured with a single forward hook on the
 **shared** `model.pool` module (called once per block), which fires exactly 3x in block
 order during one forward, giving (1,32,14,14) / (1,64,7,7) / (1,128,3,3) activations.
