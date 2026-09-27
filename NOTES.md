@@ -4,8 +4,8 @@
 Changed `train.py` default `--patience` from 5 to 12 (best-checkpoint selection still
 on val_loss, unchanged). Training now completes all 30 epochs instead of early-stopping
 at epoch 10, so `CosineAnnealingLR(T_max=30)` fully decays from 0.0008 to ~0.
-Result (`training_history.csv`): best val_loss 0.0130 at epoch **29**
-(best val_acc **99.60%**), final test accuracy **99.55%** (up from 99.36% at patience 5).
+Result (`training_history.csv`): best val_loss 0.0134 at epoch **29**
+(best val_acc **99.52%**), final test accuracy **99.62%** (up from 99.36% at patience 5).
 
 ## 2026-09-27 — Train/val/test protocol replaces test-set checkpoint selection
 Selecting the "best" checkpoint from test-set accuracy leaked test information
