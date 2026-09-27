@@ -3,6 +3,9 @@
 A PyTorch CNN for MNIST handwritten digit classification, with reproducible
 training, validation-based checkpointing, and test-set evaluation.
 
+**Built with Qwen 3.8 27B (running locally) and OpenCode**, on Ubuntu with a
+Ryzen 9 5950X and an RTX 3090.
+
 Current best result: **99.64% test accuracy** (best val_loss 0.0141 at epoch 27/30).
 
 ## Project layout
