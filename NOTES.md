@@ -1,5 +1,13 @@
 # NOTES.md — decision log (newest first)
 
+## 2026-09-27 — CI added; train.py inline shape check removed
+Added `.github/workflows/ci.yml` (ubuntu-latest, py3.14, `pytest tests/`) so the
+pre-commit test rule is enforced automatically. Removed the inline shape/log_softmax
+check in `train.py` (duplicated `test_protocol.py::test_model_shape_and_log_softmax`).
+Note on `best_model.pt`: it is NOT bit-reproducible from source — augmentation RNG
+depends on worker/thread interleaving per run (see nw=16 entry), so reruns land at
+val 0.0123–0.0145 / test 99.63–99.64%. The committed artifact is the 99.64% one.
+
 ## 2026-09-27 — Behavioral tests added (loss math, seeding, checkpoint guard)
 Question "are there enough tests?" prompted a review: `test_protocol.py` covered structure
 only, while the bugs this project actually hit were behavioral. Added

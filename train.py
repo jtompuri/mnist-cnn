@@ -74,14 +74,6 @@ def main():
 
     model = MNISTNet().to(device)
 
-    # Quick shape verification before training: input (4,1,28,28) -> output (4,10)
-    with torch.no_grad():
-        out = model(torch.randn(4, 1, 28, 28, device=device))
-    assert out.shape == (4, 10), f"Bad output shape: {out.shape}"
-    assert torch.allclose(out.exp().sum(dim=1), torch.ones(4, device=out.device), atol=1e-5), \
-        "log_softmax not valid"
-    print(f"Shape check passed: input (4,1,28,28) -> output {tuple(out.shape)}")
-
     train_loader, val_loader, _ = get_loaders(batch_size=args.batch_size)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=5e-4)

@@ -18,6 +18,7 @@ Current best result: **99.64% test accuracy** (best val_loss 0.0141 at epoch 27/
 | `tests/test_evaluation.py` | Behavior tests: loss weighting + accuracy math, seed reproducibility, checkpoint-is-trained |
 | `NOTES.md` | Decision log (protocol changes, resolved issues, rejected ideas) |
 | `AGENTS.md` | Conventions and rules for working in this repo |
+| `.github/workflows/ci.yml` | GitHub CI: runs the pytest suite on push/PR |
 
 ## Setup
 
@@ -70,6 +71,8 @@ Outputs written to the project root:
 ## Notes
 
 - The model outputs `log_softmax`, so the loss is `nn.NLLLoss` (not `CrossEntropyLoss`).
+- `best_model.pt` is not bit-reproducible: augmentation RNG depends on per-run worker/
+  thread interleaving, so identical-config reruns land at test 99.63–99.64%.
 - Full design history and rejected alternatives (e.g. `torch.compile` with no speedup,
   GPU-side augmentation with a quality cost, loader workers above 16 with no gain) are
   in `NOTES.md`.

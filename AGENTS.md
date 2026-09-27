@@ -5,7 +5,7 @@ PyTorch CNN for MNIST digit recognition.
 Files: `data.py` (loaders/splits), `model.py` (MNISTNet), `train.py` (training loop),
 `evaluate.py` (test eval, confusion matrix, misclassified.json), `visualize_predictions.py` (example grids),
 `pyproject.toml` (project metadata + dev extra), `conftest.py` + `tests/` (pytest suite),
-`README.md` (usage), `NOTES.md` (decision log).
+`README.md` (usage), `NOTES.md` (decision log), `.github/workflows/ci.yml` (CI: pytest).
 
 ## Environment
 - Python 3.14 venv in `.venv/`. Run scripts with `.venv/bin/python`.
