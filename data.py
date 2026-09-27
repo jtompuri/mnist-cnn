@@ -6,7 +6,10 @@ from torchvision import datasets, transforms
 
 
 def _max_workers(configured: int) -> int:
-    return min(configured, os.process_cpu_count())
+    limit = os.process_cpu_count()
+    if limit is None or limit <= 0:
+        return min(configured, 4)
+    return min(configured, limit)
 
 
 def get_loaders(batch_size: int = 64, seed: int = 42) -> tuple[DataLoader, DataLoader, DataLoader]:
