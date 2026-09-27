@@ -1,3 +1,4 @@
+import os
 import torch
 from torch.utils.data import DataLoader, Subset
 from torchvision import datasets, transforms
@@ -30,9 +31,10 @@ def get_loaders(batch_size=64, seed=42):
     val_dataset = Subset(train_dataset_plain, val_idx)
     test_dataset = datasets.MNIST(root="data", train=False, download=True, transform=plain_transform)
 
+    train_num_workers = int(os.environ.get("NUM_WORKERS", "16"))
     train_loader = DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True,
-        num_workers=8, persistent_workers=True, prefetch_factor=4, pin_memory=True
+        num_workers=train_num_workers, persistent_workers=True, prefetch_factor=4, pin_memory=True
     )
     val_loader = DataLoader(
         val_dataset, batch_size=batch_size, shuffle=False,

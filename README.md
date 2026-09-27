@@ -3,7 +3,7 @@
 A PyTorch CNN for MNIST handwritten digit classification, with reproducible
 training, validation-based checkpointing, and test-set evaluation.
 
-Current best result: **99.64% test accuracy** (best val_loss 0.0126 at epoch 29/30).
+Current best result: **99.63% test accuracy** (best val_loss 0.0136 at epoch 27/30).
 
 ## Project layout
 

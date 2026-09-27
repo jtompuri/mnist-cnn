@@ -1,5 +1,16 @@
 # NOTES.md — decision log (newest first)
 
+## 2026-09-27 — Train-loader workers 8 → 16
+Made train-loader worker count tunable via `NUM_WORKERS` env var (default 16) in `data.py`.
+A/B (seed 42, 30 epochs, full runs):
+- nw=8:  wall 111.15s,  best val_loss 0.0123 @ ep29, test **99.64%** (36)
+- nw=16: wall **87.91s**, best val_loss 0.0137 @ ep27, test **99.63%** (37)
+- nw=16 re-run: best val_loss 0.0136 @ ep27 (val_loss gap reproducible, not noise —
+  worker count changes the CPU-RNG interleaving that seeds RandomRotation/RandomAffine,
+  so augmented pixels differ per run; test metric is a 1-sample wash).
+Decision: keep **nw=16** (~22% faster, no meaningful loss on the final test metric).
+Note: box is shared with Ollama; 16 is fine with current headroom but could contend under load.
+
 ## 2026-09-27 — Train loader made data-loading-bound-friendly (nw=8, persistent, prefetch=4)
 Diagnosis: a bare pass over `train_loader` (no model, just moving 860 batches to GPU) ran
 6.22s vs a full epoch 6.29s → the data pass is ~99% of an epoch, i.e. training is
