@@ -36,7 +36,7 @@ def evaluate_model(model, loader, device, criterion=None):
     return avg_loss, correct / total, all_preds, all_labels
 
 
-def save_confusion_matrices(all_labels, all_preds, accuracy):
+def save_confusion_matrices(all_labels, all_preds, accuracy, out_path="confusion_matrix.png"):
     cm = confusion_matrix(all_labels, all_preds, labels=list(range(10)))
     cm_norm = cm.astype("float") / cm.sum(axis=1, keepdims=True)
 
@@ -60,7 +60,7 @@ def save_confusion_matrices(all_labels, all_preds, accuracy):
 
     fig.suptitle(f"Overall accuracy: {100 * accuracy:.2f}%")
     fig.tight_layout()
-    fig.savefig("confusion_matrix.png", dpi=150)
+    fig.savefig(out_path, dpi=150)
     plt.close(fig)
     return cm
 
@@ -74,6 +74,14 @@ def _annotate_cm(ax, cm, thresholds, fmt="d"):
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Evaluate best model on the test set")
+    parser.add_argument("--out-dir", type=str, default=".",
+                        help="directory for confusion_matrix.png and misclassified.json")
+    args = parser.parse_args()
+    out_dir = os.path.abspath(args.out_dir)
+    os.makedirs(out_dir, exist_ok=True)
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model = MNISTNet().to(device)
@@ -83,17 +91,19 @@ def main():
     _, accuracy, all_preds, all_labels = evaluate_model(model, test_loader, device)
     print(f"Test accuracy: {100 * accuracy:.2f}%")
 
-    cm = save_confusion_matrices(all_labels, all_preds, accuracy)
+    cm_path = os.path.join(out_dir, "confusion_matrix.png")
+    cm = save_confusion_matrices(all_labels, all_preds, accuracy, cm_path)
     print(f"Confusion matrix:\n{cm}")
-    print("Saved confusion_matrix.png")
+    print(f"Saved {cm_path}")
 
     misclassified = [
         {"index": i, "true_label": t, "predicted_label": p}
         for i, (t, p) in enumerate(zip(all_labels, all_preds)) if t != p
     ]
-    with open("misclassified.json", "w") as f:
+    mis_path = os.path.join(out_dir, "misclassified.json")
+    with open(mis_path, "w") as f:
         json.dump(misclassified, f, indent=2)
-    print(f"Saved misclassified.json ({len(misclassified)} samples)")
+    print(f"Saved {mis_path} ({len(misclassified)} samples)")
 
 
 if __name__ == "__main__":

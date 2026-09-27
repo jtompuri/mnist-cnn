@@ -1,5 +1,12 @@
 # NOTES.md — decision log (newest first)
 
+## 2026-09-27 — Test suite + eval `--out-dir` added
+Added `tests/test_protocol.py` (pytest): model shape/log_softmax, 55k/5k/10k split sizes,
+validation loader determinism (no augmentation), and `best_model.pt` round-trip into a
+fresh `MNISTNet` (guards against the `_orig_mod.` prefix gotcha found during the
+torch.compile investigation). `evaluate.py` gained `--out-dir` (default `.`).
+`pyproject.toml` now declares project dependencies + a `dev` extra (pytest).
+
 ## 2026-09-27 — torch.compile investigated, NOT adopted
 Profile showed low GPU utilization (~17%) and ~97% of epoch time in per-step compute
 wall (data loading only 2.7%), suggesting Python/kernel-launch overhead could be
