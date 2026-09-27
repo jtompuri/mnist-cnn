@@ -32,7 +32,7 @@ def get_loaders(batch_size=64, seed=42):
 
     train_loader = DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True,
-        num_workers=4, pin_memory=True
+        num_workers=8, persistent_workers=True, prefetch_factor=4, pin_memory=True
     )
     val_loader = DataLoader(
         val_dataset, batch_size=batch_size, shuffle=False,

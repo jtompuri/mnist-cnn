@@ -1,5 +1,15 @@
 # NOTES.md — decision log (newest first)
 
+## 2026-09-27 — Train loader made data-loading-bound-friendly (nw=8, persistent, prefetch=4)
+Diagnosis: a bare pass over `train_loader` (no model, just moving 860 batches to GPU) ran
+6.22s vs a full epoch 6.29s → the data pass is ~99% of an epoch, i.e. training is
+**data-loading bound**, not compute bound (the old ~2.7%-data figure was a per-step
+measurement artifact of Ollama GPU contention + per-step syncs). Applied to the TRAIN
+loader only: `num_workers=4→8`, `persistent_workers=True`, `prefetch_factor=4`.
+Result: full epoch 6.29s → **~3.3s** (~2x faster). No batch-size/augmentation/hyperparameter
+changes. Still data-bound at ~99% of the epoch; the next lever (not applied) is moving
+augmentation to the GPU.
+
 ## 2026-09-27 — Test suite + eval `--out-dir` added
 Added `tests/test_protocol.py` (pytest): model shape/log_softmax, 55k/5k/10k split sizes,
 validation loader determinism (no augmentation), and `best_model.pt` round-trip into a
