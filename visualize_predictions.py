@@ -116,7 +116,7 @@ def main() -> None:
     parser.add_argument(
         "--out-dir",
         type=str,
-        default=".",
+        default="results",
         help="directory for correct_predictions.png and incorrect_predictions.png",
     )
     parser.add_argument(

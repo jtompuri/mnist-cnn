@@ -100,7 +100,7 @@ def main() -> None:
     parser.add_argument(
         "--out-dir",
         type=str,
-        default=".",
+        default="results",
         help="directory for confusion_matrix.png and misclassified.json",
     )
     args = parser.parse_args()

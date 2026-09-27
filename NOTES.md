@@ -1,5 +1,29 @@
 # NOTES.md — decision log (newest first)
 
+## 2026-09-27 — Generated outputs moved to a `results/` subfolder
+- All script outputs (training curves + CSV, confusion matrix + misclassified.json,
+  prediction grids, feature figures) now default to `results/`; `--out-dir` still
+  overrides per run (e.g. `results/run1`). `train.py` gained a small `_ensure_parent_dir`
+  helper (matplotlib/CSV do not create parent dirs). Existing committed PNGs +
+  misclassified.json + training_history.csv moved into `results/` via `git mv`.
+
+## 2026-09-27 — visualize_features.py added (conv1 kernels + per-digit activation maps)
+New script `visualize_features.py` (make target: `make features`) for inspecting learned
+features, loading `best_model.pt` read-only (eval mode, `torch.no_grad`):
+- `conv1_filters.png`: conv1's 32 learned 3x3 kernels as a 4x8 grid (per-kernel
+  min/max normalization to a shared [0,1], grayscale).
+- `feature_maps.png`: one test image per digit 0-9 (from the un-augmented test set),
+  with 8 evenly-spaced channels sampled from the output of each of the three conv
+  blocks (grayscale), plus the model's predicted digit per row.
+Implementation notes: block outputs are captured with a single forward hook on the
+**shared** `model.pool` module (called once per block), which fires exactly 3x in block
+order during one forward, giving (1,32,14,14) / (1,64,7,7) / (1,128,3,3) activations.
+Display inputs are denormalized (undo `Normalize(0.1307, 0.3081)`) to [0,1].
+No changes to model architecture, hyperparameters, augmentation, or the test-set
+protocol (test images are only read for display, not used for any tuning).
+Verified: runs on CUDA, both PNGs produced; `ruff check` clean, `pyright` 0 errors,
+`pytest` 8/8.
+
 ## 2026-09-27 — Engineering merge from the `mnist` sibling repo
 Folded the engineering strengths of the earlier `jtompuri/mnist` repo into this
 repo, keeping this repo's (better) ML setup untouched:

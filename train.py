@@ -14,7 +14,13 @@ from utils import get_device, set_seed
 seed_everything = set_seed
 
 
-def plot_curves(history: list[dict[str, float]], out_path: str = "training_curves.png") -> None:
+def _ensure_parent_dir(out_path: str) -> None:
+    parent = os.path.dirname(out_path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+
+
+def plot_curves(history: list[dict[str, float]], out_path: str = "results/training_curves.png") -> None:
     import matplotlib
 
     matplotlib.use("Agg")
@@ -40,15 +46,17 @@ def plot_curves(history: list[dict[str, float]], out_path: str = "training_curve
     best = min(history, key=lambda h: h["val_loss"])
     axes[1].axvline(best["epoch"], color="gray", linestyle="--", alpha=0.5)
     fig.tight_layout()
+    _ensure_parent_dir(out_path)
     fig.savefig(out_path, dpi=150)
     plt.close(fig)
     print(f"Saved {out_path}")
 
 
 def save_history_csv(
-    history: list[dict[str, float]], out_path: str = "training_history.csv"
+    history: list[dict[str, float]], out_path: str = "results/training_history.csv"
 ) -> None:
     fieldnames = ["epoch", "train_loss", "val_loss", "val_acc", "lr"]
+    _ensure_parent_dir(out_path)
     with open(out_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()

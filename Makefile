@@ -1,6 +1,6 @@
 PYTHON := .venv/bin/python
 
-.PHONY: setup train eval viz test lint format typecheck check
+.PHONY: setup train eval viz features test lint format typecheck check
 
 setup:
 	.venv/bin/pip install -e ".[dev]"
@@ -13,6 +13,9 @@ eval:
 
 viz:
 	$(PYTHON) visualize_predictions.py
+
+features:
+	$(PYTHON) visualize_features.py
 
 test:
 	$(PYTHON) -m pytest tests/

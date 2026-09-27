@@ -14,8 +14,9 @@ Current best result: **99.64% test accuracy** (best val_loss 0.0141 at epoch 27/
 | `train.py` | Training loop: Adam + cosine LR, early stopping, best-checkpoint saving, curves + CSV |
 | `evaluate.py` | One-shot test evaluation; writes `confusion_matrix.png` and `misclassified.json` (or a `--out-dir`) |
 | `visualize_predictions.py` | Sample prediction grids: `correct_predictions.png`, `incorrect_predictions.png` (optional `--out-dir`, `--num-examples`) |
+| `visualize_features.py` | Learned-feature grids: `conv1_filters.png` (32 conv1 kernels) + `feature_maps.png` (per-digit block activation maps) |
 | `utils.py` | Shared `get_device` (CUDA -> MPS -> CPU), `set_seed`, `load_model` |
-| `Makefile` | Make targets: `setup train eval viz test lint format typecheck check` |
+| `Makefile` | Make targets: `setup train eval viz features test lint format typecheck check` |
 | `pyproject.toml` | Package metadata, dependencies, dev extra (pytest, ruff, pyright), tool config |
 | `tests/test_protocol.py` | Sanity tests: shape/log_softmax, split sizes, val determinism, checkpoint loads |
 | `tests/test_evaluation.py` | Behavior tests: loss weighting + accuracy math, seed reproducibility, checkpoint-is-trained |
@@ -61,6 +62,12 @@ make check          # lint + typecheck + test
 # outputs can be redirected and sized:
 .venv/bin/python visualize_predictions.py --out-dir results/run1 --num-examples 20 --cols 5
 
+# Visualize learned features: conv1 kernel grid + per-digit conv-block activation maps
+# (loads best_model.pt; writes conv1_filters.png and feature_maps.png)
+.venv/bin/python visualize_features.py
+# outputs can be redirected:
+.venv/bin/python visualize_features.py --out-dir results/run1 --model-path best_model.pt
+
 # Sanity tests (shape check, split sizes, validation determinism, checkpoint loads)
 .venv/bin/python -m pytest tests/ -v
 
@@ -68,12 +75,13 @@ make check          # lint + typecheck + test
 make lint format typecheck
 ```
 
-Outputs written to the project root:
+Outputs written to `results/` (override per-run with `--out-dir`):
 
-- `best_model.pt` — best checkpoint by validation loss
-- `training_history.csv`, `training_curves.png` — per-epoch metrics
-- `confusion_matrix.png`, `misclassified.json` — test evaluation
-- `correct_predictions.png`, `incorrect_predictions.png` — sample grids
+- `best_model.pt` — best checkpoint by validation loss (project root)
+- `results/training_history.csv`, `results/training_curves.png` — per-epoch metrics
+- `results/confusion_matrix.png`, `results/misclassified.json` — test evaluation
+- `results/correct_predictions.png`, `results/incorrect_predictions.png` — sample grids
+- `results/conv1_filters.png`, `results/feature_maps.png` — learned feature visualizations
 
 ## Protocol
 
