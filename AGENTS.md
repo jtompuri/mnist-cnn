@@ -20,7 +20,7 @@ All from the project root:
 .venv/bin/python visualize_predictions.py      # writes correct/incorrect_predictions.png
 ```
 `train.py` argparse (defaults in `main()`): `--epochs 30`, `--batch-size 64`, `--lr 0.0008`,
-`--seed 42`, `--patience 5`. `evaluate.py` and `visualize_predictions.py` take no arguments.
+`--seed 42`, `--patience 12`. `evaluate.py` and `visualize_predictions.py` take no arguments.
 
 ## Rules
 - Never change architecture, hyperparameters or augmentation without asking first,

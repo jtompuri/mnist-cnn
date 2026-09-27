@@ -1,5 +1,12 @@
 # NOTES.md — decision log (newest first)
 
+## 2026-09-27 — patience raised to 12 so cosine LR schedule runs its course (resolves open issue)
+Changed `train.py` default `--patience` from 5 to 12 (best-checkpoint selection still
+on val_loss, unchanged). Training now completes all 30 epochs instead of early-stopping
+at epoch 10, so `CosineAnnealingLR(T_max=30)` fully decays from 0.0008 to ~0.
+Result (`training_history.csv`): best val_loss 0.0130 at epoch **29**
+(best val_acc **99.60%**), final test accuracy **99.55%** (up from 99.36% at patience 5).
+
 ## 2026-09-27 — Train/val/test protocol replaces test-set checkpoint selection
 Selecting the "best" checkpoint from test-set accuracy leaked test information
 into model selection, so the earlier 99.60% test result (60k train, no val split)
@@ -8,11 +15,12 @@ val-only checkpointing + early stopping. Test set now evaluated once, in `evalua
 Result (`training_history.csv`): best val_loss 0.02376 at epoch 5 (val_acc 99.24%);
 early stopped at epoch 10 (patience 5); final test accuracy **99.36%**.
 
-## 2026-09-27 — Open issue: early stopping vs cosine LR schedule
-Early stopping at `--patience 5` triggers on validation noise (val_loss spiked back up
-from 0.0238 to ~0.038 at epoch 6) and cuts `CosineAnnealingLR(T_max=30)` short at
+## 2026-09-27 — ~~Open issue: early stopping vs cosine LR schedule~~ (RESOLVED)
+Early stopping at `--patience 5` triggered on validation noise (val_loss spiked back up
+from 0.0238 to ~0.038 at epoch 6) and cut `CosineAnnealingLR(T_max=30)` short at
 epoch 10, before the schedule meaningfully decays from the 0.0008 start.
-Not fixed deliberately; needs a decision (e.g. larger T_max, ReduceLROnPlateau, or lower patience) before further tuning.
+Resolved 2026-09-27: default patience raised to 12 (see entry above); training now
+completes the full 30-epoch cosine schedule.
 
 ## 2026-09-27 — torch switched from CPU build to CUDA build
 The CPU wheel had been installed at some point, silently forcing training onto the CPU.

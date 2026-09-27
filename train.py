@@ -64,7 +64,7 @@ def main():
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--lr", type=float, default=0.0008)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--patience", type=int, default=5,
+    parser.add_argument("--patience", type=int, default=12,
                         help="early stopping patience (epochs without best val_loss)")
     args = parser.parse_args()
 
