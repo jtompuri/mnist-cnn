@@ -4,8 +4,9 @@
 PyTorch CNN for MNIST digit recognition.
 Files: `data.py` (loaders/splits), `model.py` (MNISTNet), `train.py` (training loop),
 `evaluate.py` (test eval, confusion matrix, misclassified.json), `visualize_predictions.py` (example grids),
-`pyproject.toml` (project metadata + dev extra), `conftest.py` + `tests/` (pytest suite),
-`README.md` (usage), `NOTES.md` (decision log), `.github/workflows/ci.yml` (CI: pytest).
+`utils.py` (get_device CUDA->MPS->CPU, set_seed, load_model), `Makefile` (setup/train/eval/viz/test/lint/typecheck/check),
+`pyproject.toml` (project metadata + dev extra + ruff/pyright config), `conftest.py` + `tests/` (pytest suite),
+`README.md` (usage), `NOTES.md` (decision log), `.github/workflows/ci.yml` (CI: ruff + pyright + pytest).
 
 ## Environment
 - Python 3.14 venv in `.venv/`. Run scripts with `.venv/bin/python`.
@@ -15,17 +16,21 @@ Files: `data.py` (loaders/splits), `model.py` (MNISTNet), `train.py` (training l
 - The GPU is shared with the Ollama model serving this session; only ~2-3 GB VRAM is free. Keep batch sizes modest (default 64).
 
 ## Commands
-All from the project root:
+All from the project root (or via the Makefile: `make setup train eval viz test lint format typecheck check`):
 ```bash
 .venv/bin/python train.py                      # optional: --epochs --batch-size --lr --seed --patience
 .venv/bin/python evaluate.py                   # test eval; optional --out-dir (default "."); writes confusion_matrix.png + misclassified.json
-.venv/bin/python visualize_predictions.py      # writes correct/incorrect_predictions.png
+.venv/bin/python visualize_predictions.py      # writes correct/incorrect_predictions.png; optional --num-examples --cols
 .venv/bin/python -m pytest tests/              # protocol tests (shape, splits, val determinism, checkpoint) + behavior tests (loss math, seeding, checkpoint sanity)
+.venv/bin/ruff check .                         # lint (ruff)
+.venv/bin/ruff format .                        # format (ruff)
+pyright .                                      # typecheck (pyright, config in pyproject.toml)
 ```
 `train.py` argparse (defaults in `main()`): `--epochs 30`, `--batch-size 64`, `--lr 0.0008`,
 `--seed 42`, `--patience 12`. `evaluate.py` takes optional `--out-dir`.
-`visualize_predictions.py` takes optional `--out-dir` (writes the grids there;
-reads `misclassified.json` from cwd).
+`visualize_predictions.py` takes optional `--out-dir`, `--num-examples` (default 8), `--cols` (default 4)
+(writes the grids there; reads `misclassified.json` from the out dir).
+Device selection (train/evaluate/visualize) comes from `utils.get_device()`: CUDA -> MPS -> CPU.
 
 ## Tuning knobs
 - `NUM_WORKERS` env var (default `16`): train-loader worker count in `data.py`.

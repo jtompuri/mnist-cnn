@@ -1,5 +1,25 @@
 # NOTES.md — decision log (newest first)
 
+## 2026-09-27 — Engineering merge from the `mnist` sibling repo
+Folded the engineering strengths of the earlier `jtompuri/mnist` repo into this
+repo, keeping this repo's (better) ML setup untouched:
+- **MPS support** (Apple Silicon): new `utils.get_device()` CUDA -> MPS -> CPU, now
+  used by train/evaluate/visualize. `utils.set_seed()` also seeds MPS. This repo
+  previously hard-coded `cuda or cpu` and would have silently trained on CPU on a
+  Mac.
+- **Shared `utils.py`**: `get_device`, `set_seed`, `load_model(weights_only=True)`.
+  `train.seed_everything` is now an alias for `utils.set_seed` (tests still import it).
+- **Type hints** added across model/data/train/evaluate/visualize/utils.
+- **Packaging**: `pyproject.toml` is now the single source of truth (added
+  `[build-system]`, `dev` extra = pytest+ruff+pyright, `[tool.ruff]`); `requirements.txt`
+  removed; install is `pip install -e ".[dev]"`.
+- **Makefile**: `setup train eval viz test lint format typecheck check`.
+- **Code quality**: ruff (lint+format) and pyright wired in; CI switched from
+  `requirements.txt + pytest` to `pip install -e ".[dev]"` + `ruff check` + `pyright` + pytest.
+- **visualize_predictions.py**: `--num-examples` (default 8) and adaptive grid rows.
+Verified locally: `ruff check` clean, `pyright` 0 errors, `pytest` 8/8 pass.
+No architecture/hyperparameter/augmentation changes.
+
 ## 2026-09-27 — visualize_predictions.py gained --out-dir
 Symmetry with `evaluate.py`: grids can now be written to a custom directory, and the
 `misclassified.json` lookup uses that same directory (fallback: cwd). Default behavior

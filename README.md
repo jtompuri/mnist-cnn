@@ -13,12 +13,15 @@ Current best result: **99.64% test accuracy** (best val_loss 0.0141 at epoch 27/
 | `data.py` | Train/val/test loaders: 55k train / 5k val split (seed 42); light augmentation on train only |
 | `train.py` | Training loop: Adam + cosine LR, early stopping, best-checkpoint saving, curves + CSV |
 | `evaluate.py` | One-shot test evaluation; writes `confusion_matrix.png` and `misclassified.json` (or a `--out-dir`) |
-| `visualize_predictions.py` | Sample prediction grids: `correct_predictions.png`, `incorrect_predictions.png` (optional `--out-dir`) |
+| `visualize_predictions.py` | Sample prediction grids: `correct_predictions.png`, `incorrect_predictions.png` (optional `--out-dir`, `--num-examples`) |
+| `utils.py` | Shared `get_device` (CUDA -> MPS -> CPU), `set_seed`, `load_model` |
+| `Makefile` | Make targets: `setup train eval viz test lint format typecheck check` |
+| `pyproject.toml` | Package metadata, dependencies, dev extra (pytest, ruff, pyright), tool config |
 | `tests/test_protocol.py` | Sanity tests: shape/log_softmax, split sizes, val determinism, checkpoint loads |
 | `tests/test_evaluation.py` | Behavior tests: loss weighting + accuracy math, seed reproducibility, checkpoint-is-trained |
 | `NOTES.md` | Decision log (protocol changes, resolved issues, rejected ideas) |
 | `AGENTS.md` | Conventions and rules for working in this repo |
-| `.github/workflows/ci.yml` | GitHub CI: runs the pytest suite on push/PR |
+| `.github/workflows/ci.yml` | GitHub CI: ruff + pyright + pytest on push/PR |
 
 ## Setup
 
@@ -26,20 +29,25 @@ Python 3.12+ venv, CUDA build of PyTorch (do **not** install `+cpu` wheels):
 
 ```bash
 python -m venv .venv
-.venv/bin/pip install -r requirements.txt
-# development/test deps (or: .venv/bin/pip install -e ".[dev]")
-.venv/bin/pip install pytest
+make setup          # = .venv/bin/pip install -e ".[dev]"
 ```
 
 MNIST data is downloaded automatically to `data/` on first run.
-Training runs on CUDA when available; `train.py` prints `Using device: cuda`.
+Training runs on CUDA when available, falling back to MPS (Apple Silicon) and then CPU;
+`train.py` prints the chosen device (e.g. `Using device: cuda`).
 Train-loader worker count is tunable via the `NUM_WORKERS` env var (default 16).
 
 ## Usage
 
-All commands from the project root:
+All commands from the project root — either the Makefile or the raw scripts:
 
 ```bash
+make train          # = .venv/bin/python train.py
+make eval           # = .venv/bin/python evaluate.py
+make viz            # = .venv/bin/python visualize_predictions.py
+make test           # = .venv/bin/python -m pytest tests/
+make check          # lint + typecheck + test
+
 # Train (defaults: --epochs 30 --batch-size 64 --lr 0.0008 --seed 42 --patience 12)
 .venv/bin/python train.py
 
@@ -50,11 +58,14 @@ All commands from the project root:
 
 # Visualize example correct/incorrect predictions
 .venv/bin/python visualize_predictions.py
-# outputs can be redirected:
-.venv/bin/python visualize_predictions.py --out-dir results/run1
+# outputs can be redirected and sized:
+.venv/bin/python visualize_predictions.py --out-dir results/run1 --num-examples 20 --cols 5
 
 # Sanity tests (shape check, split sizes, validation determinism, checkpoint loads)
 .venv/bin/python -m pytest tests/ -v
+
+# Lint / typecheck / format
+make lint format typecheck
 ```
 
 Outputs written to the project root:

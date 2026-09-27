@@ -1,26 +1,22 @@
 import argparse
 import csv
 import os
-import random
 
-import numpy as np
 import torch
 import torch.nn as nn
+
 from data import get_loaders
 from evaluate import evaluate_model
 from model import MNISTNet
+from utils import get_device, set_seed
+
+# Backward-compatible alias: other modules/tests import seed_everything from train.
+seed_everything = set_seed
 
 
-def seed_everything(seed):
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed)
-
-
-def plot_curves(history, out_path="training_curves.png"):
+def plot_curves(history: list[dict[str, float]], out_path: str = "training_curves.png") -> None:
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
@@ -49,7 +45,9 @@ def plot_curves(history, out_path="training_curves.png"):
     print(f"Saved {out_path}")
 
 
-def save_history_csv(history, out_path="training_history.csv"):
+def save_history_csv(
+    history: list[dict[str, float]], out_path: str = "training_history.csv"
+) -> None:
     fieldnames = ["epoch", "train_loss", "val_loss", "val_acc", "lr"]
     with open(out_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -58,18 +56,22 @@ def save_history_csv(history, out_path="training_history.csv"):
     print(f"Saved {out_path}")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Train MNISTNet")
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--lr", type=float, default=0.0008)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--patience", type=int, default=12,
-                        help="early stopping patience (epochs without best val_loss)")
+    parser.add_argument(
+        "--patience",
+        type=int,
+        default=12,
+        help="early stopping patience (epochs without best val_loss)",
+    )
     args = parser.parse_args()
 
     seed_everything(args.seed)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = get_device()
     print(f"Using device: {device}")
 
     model = MNISTNet().to(device)
@@ -100,21 +102,23 @@ def main():
             seen += labels.size(0)
         train_loss = running_loss / seen
 
-        val_loss, val_acc, _, _ = evaluate_model(
-            model, val_loader, device, criterion
-        )
+        val_loss, val_acc, _, _ = evaluate_model(model, val_loader, device, criterion)
         assert val_loss is not None  # criterion was passed, so a loss is returned
-        print(f"Epoch {epoch}/{args.epochs} | train_loss: {train_loss:.4f} | "
-              f"val_loss: {val_loss:.4f} | val_acc: {100 * val_acc:.2f}% | "
-              f"lr: {optimizer.param_groups[0]['lr']:.6f}")
+        print(
+            f"Epoch {epoch}/{args.epochs} | train_loss: {train_loss:.4f} | "
+            f"val_loss: {val_loss:.4f} | val_acc: {100 * val_acc:.2f}% | "
+            f"lr: {optimizer.param_groups[0]['lr']:.6f}"
+        )
 
-        history.append({
-            "epoch": epoch,
-            "train_loss": train_loss,
-            "val_loss": val_loss,
-            "val_acc": val_acc,
-            "lr": optimizer.param_groups[0]["lr"],
-        })
+        history.append(
+            {
+                "epoch": epoch,
+                "train_loss": train_loss,
+                "val_loss": val_loss,
+                "val_acc": val_acc,
+                "lr": optimizer.param_groups[0]["lr"],
+            }
+        )
 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
@@ -134,8 +138,9 @@ def main():
     plot_curves(history)
 
     if os.path.exists("best_model.pt"):
-        print(f"Done. Best val_loss {best_val_loss:.4f} at epoch {best_epoch}. "
-              f"Saved to best_model.pt")
+        print(
+            f"Done. Best val_loss {best_val_loss:.4f} at epoch {best_epoch}. Saved to best_model.pt"
+        )
     else:
         raise RuntimeError("No model was saved (no epoch completed).")
 

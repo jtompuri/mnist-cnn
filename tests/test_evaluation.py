@@ -4,6 +4,7 @@ Distinct from test_protocol.py (structure/protocol): these guard the bugs this
 project actually hit — per-batch loss averaging (fixed 2026-09-27) and a
 best_model.pt that must actually be a trained model.
 """
+
 import math
 from pathlib import Path
 
@@ -52,9 +53,7 @@ def test_evaluate_model_weighted_loss_and_accuracy():
     labels = [0, 1, 0, 1, 0]
     loader = DataLoader(_IndexedImageDataset(labels), batch_size=2)
     model = _IndexAwareModel()
-    loss, acc, preds, got_labels = evaluate_model(
-        model, loader, torch.device("cpu"), nn.NLLLoss()
-    )
+    loss, acc, preds, got_labels = evaluate_model(model, loader, torch.device("cpu"), nn.NLLLoss())
     assert acc == pytest.approx(3 / 5)
     assert got_labels == labels
     assert len(preds) == 5 and set(preds) == {0}
@@ -71,9 +70,7 @@ def test_evaluate_model_loss_range_on_real_model():
     model.load_state_dict(torch.load(ckpt, map_location="cpu"))
     model.eval()
     _, val_loader, _ = get_loaders(batch_size=64)
-    loss, acc, _, _ = evaluate_model(
-        model, val_loader, torch.device("cpu"), nn.NLLLoss()
-    )
+    loss, acc, _, _ = evaluate_model(model, val_loader, torch.device("cpu"), nn.NLLLoss())
     assert loss is not None
     # Trained model on 5k validation images: loss must be finite, in [0, log(10)],
     # and substantially better than a random classifier (ln 10 ≈ 2.3026).
@@ -83,7 +80,6 @@ def test_evaluate_model_loss_range_on_real_model():
 
 
 def test_seed_everything_reproducible_training():
-    from random import randint as _ri
 
     def run():
         seed_everything(123)
@@ -105,8 +101,12 @@ def test_seed_everything_reproducible_training():
         assert torch.equal(sd_a[key], sd_b[key]), f"non-deterministic init/step: {key}"
     assert loss_a == loss_b
     # seed_everything covers random/np/torch — all three streams in sync
-    seed_everything(7); from random import randint as _ri; a1 = [_ri(0, 100) for _ in range(5)]
-    seed_everything(7); a2 = [_ri(0, 100) for _ in range(5)]
+    from random import randint
+
+    seed_everything(7)
+    a1 = [randint(0, 100) for _ in range(5)]
+    seed_everything(7)
+    a2 = [randint(0, 100) for _ in range(5)]
     assert a1 == a2
 
 

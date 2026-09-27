@@ -4,3 +4,4 @@ __pycache__/
 *.pt
 .ipynb_checkpoints/
 .pytest_cache/
+*.egg-info/

@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import torch
+
 from data import get_loaders
 from model import MNISTNet
 
