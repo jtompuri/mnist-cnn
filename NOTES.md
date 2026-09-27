@@ -5,10 +5,14 @@ Made train-loader worker count tunable via `NUM_WORKERS` env var (default 16) in
 A/B (seed 42, 30 epochs, full runs):
 - nw=8:  wall 111.15s,  best val_loss 0.0123 @ ep29, test **99.64%** (36)
 - nw=16: wall **87.91s**, best val_loss 0.0137 @ ep27, test **99.63%** (37)
-- nw=16 re-run: best val_loss 0.0136 @ ep27 (val_loss gap reproducible, not noise —
-  worker count changes the CPU-RNG interleaving that seeds RandomRotation/RandomAffine,
-  so augmented pixels differ per run; test metric is a 1-sample wash).
+Run-to-run variance: same-config nw=16 reruns give val_loss 0.0136→0.0145→0.0141 and
+test ±1 sample — the CPU-RNG interleaving that seeds RandomRotation/RandomAffine differs
+each run, so val_loss wanders ~0.0123–0.0145 and test sits at 99.63–99.64%.
 Decision: keep **nw=16** (~22% faster, no meaningful loss on the final test metric).
+Seq. re-test of higher worker counts (16-core/32-thread Ryzen 9 5950X), run one at a time:
+nw=16 → 88.4s, nw=24 → 88.7s, nw=32 → 91.3s → **no gain above 16**; SMT threads don't
+help a GPU-consumption-bound pipeline, extra workers only add scheduler overhead.
+Final committed model (nw=16 rerun): best val_loss 0.0141 @ ep27, test **99.64%** (36).
 Note: box is shared with Ollama; 16 is fine with current headroom but could contend under load.
 
 ## 2026-09-27 — Train loader made data-loading-bound-friendly (nw=8, persistent, prefetch=4)
