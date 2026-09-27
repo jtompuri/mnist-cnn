@@ -6,7 +6,7 @@ training, validation-based checkpointing, and test-set evaluation.
 **Built with Qwen 3.8 27B (running locally) and OpenCode**, on Ubuntu with a
 Ryzen 9 5950X and an RTX 3090.
 
-Current best result: **99.64% test accuracy** (best val_loss 0.0141 at epoch 27/30).
+Current best result: **99.62% test accuracy** (best val_loss 0.0136 at epoch 26/30).
 
 ## Project layout
 
@@ -113,7 +113,7 @@ Outputs written to `results/` (override per-run with `--out-dir`):
 
 - The model outputs `log_softmax`, so the loss is `nn.NLLLoss` (not `CrossEntropyLoss`).
 - `best_model.pt` is not bit-reproducible: augmentation RNG depends on per-run worker/
-  thread interleaving, so identical-config reruns land at test 99.63–99.64%.
+  thread interleaving, so identical-config reruns land at test 99.62–99.64%.
 - Full design history and rejected alternatives (e.g. `torch.compile` with no speedup,
   GPU-side augmentation with a quality cost, loader workers above 16 with no gain) are
   in `NOTES.md`.
