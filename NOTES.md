@@ -1,5 +1,16 @@
 # NOTES.md — decision log (newest first)
 
+## 2026-09-27 — torch.compile investigated, NOT adopted
+Profile showed low GPU utilization (~17%) and ~97% of epoch time in per-step compute
+wall (data loading only 2.7%), suggesting Python/kernel-launch overhead could be
+reduced with `torch.compile`. A/B benchmark (warm, same process, 60k images, batch 64):
+eager **6.94s/epoch** vs compiled **7.11s/epoch** (first epoch 7.38s incl. one-time
+compile) — no speedup, slight regression, consistent with the small model size and
+the GPU being shared with Ollama. Also verified: saving `compiled_model.state_dict()`
+writes `_orig_mod.`-prefixed keys that a plain `MNISTNet.load_state_dict()` rejects,
+so integration would have required `_orig_mod`-safe checkpointing in train/eval/visualize.
+Decision (user-approved): do not integrate `torch.compile`; no code changes.
+
 ## 2026-09-27 — patience raised to 12 so cosine LR schedule runs its course (resolves open issue)
 Changed `train.py` default `--patience` from 5 to 12 (best-checkpoint selection still
 on val_loss, unchanged). Training now completes all 30 epochs instead of early-stopping
