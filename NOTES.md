@@ -1,5 +1,16 @@
 # NOTES.md — decision log (newest first)
 
+## 2026-09-27 — Behavioral tests added (loss math, seeding, checkpoint guard)
+Question "are there enough tests?" prompted a review: `test_protocol.py` covered structure
+only, while the bugs this project actually hit were behavioral. Added
+`tests/test_evaluation.py`: (1) `evaluate_model` sample-weighted loss + accuracy against a
+synthetic index-aware model with unequal batch sizes (2, 2, 1) — a uniform-loss test would
+NOT catch the old per-batch-averaging bug, which this one does (old code: 33.67 vs correct
+40.24); (2) `seed_everything` reproduces init + 3 optimizer steps bit-for-bit;
+(3) val-loss range [0, ln 10] on the real checkpoint; (4) `best_model.pt` must score > 95%
+test accuracy so a corrupted/random checkpoint file cannot masquerade as trained.
+Suite now 8 tests, all passing.
+
 ## 2026-09-27 — Train-loader workers 8 → 16
 Made train-loader worker count tunable via `NUM_WORKERS` env var (default 16) in `data.py`.
 A/B (seed 42, 30 epochs, full runs):

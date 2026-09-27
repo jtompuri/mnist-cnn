@@ -20,7 +20,7 @@ All from the project root:
 .venv/bin/python train.py                      # optional: --epochs --batch-size --lr --seed --patience
 .venv/bin/python evaluate.py                   # test eval; optional --out-dir (default "."); writes confusion_matrix.png + misclassified.json
 .venv/bin/python visualize_predictions.py      # writes correct/incorrect_predictions.png
-.venv/bin/python -m pytest tests/              # sanity tests (shape, splits, val determinism, checkpoint load)
+.venv/bin/python -m pytest tests/              # protocol tests (shape, splits, val determinism, checkpoint) + behavior tests (loss math, seeding, checkpoint sanity)
 ```
 `train.py` argparse (defaults in `main()`): `--epochs 30`, `--batch-size 64`, `--lr 0.0008`,
 `--seed 42`, `--patience 12`. `evaluate.py` takes optional `--out-dir`. `visualize_predictions.py` takes no arguments.

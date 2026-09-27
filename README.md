@@ -15,6 +15,7 @@ Current best result: **99.64% test accuracy** (best val_loss 0.0141 at epoch 27/
 | `evaluate.py` | One-shot test evaluation; writes `confusion_matrix.png` and `misclassified.json` (or a `--out-dir`) |
 | `visualize_predictions.py` | Sample prediction grids: `correct_predictions.png`, `incorrect_predictions.png` |
 | `tests/test_protocol.py` | Sanity tests: shape/log_softmax, split sizes, val determinism, checkpoint loads |
+| `tests/test_evaluation.py` | Behavior tests: loss weighting + accuracy math, seed reproducibility, checkpoint-is-trained |
 | `NOTES.md` | Decision log (protocol changes, resolved issues, rejected ideas) |
 | `AGENTS.md` | Conventions and rules for working in this repo |
 
