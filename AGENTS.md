@@ -3,10 +3,12 @@
 ## Project
 PyTorch CNN for MNIST digit recognition.
 Files: `data.py` (loaders/splits), `model.py` (MNISTNet), `train.py` (training loop),
-`evaluate.py` (test eval, confusion matrix, misclassified.json), `visualize_predictions.py` (example grids).
+`evaluate.py` (test eval, confusion matrix, misclassified.json), `visualize_predictions.py` (example grids),
+`pyproject.toml` (project metadata + dev extra), `conftest.py` + `tests/` (pytest suite),
+`README.md` (usage), `NOTES.md` (decision log).
 
 ## Environment
-- Python 3.12 venv in `.venv/`. Run scripts with `.venv/bin/python`.
+- Python 3.14 venv in `.venv/`. Run scripts with `.venv/bin/python`.
 - GPU: RTX 3090. torch is the CUDA build (torch 2.14.0+cu130).
   **Never install CPU wheels (`+cpu`)** — this happened once and silently forced training onto the CPU.
   Training must print `Using device: cuda`.
@@ -16,11 +18,17 @@ Files: `data.py` (loaders/splits), `model.py` (MNISTNet), `train.py` (training l
 All from the project root:
 ```bash
 .venv/bin/python train.py                      # optional: --epochs --batch-size --lr --seed --patience
-.venv/bin/python evaluate.py                   # test eval, writes confusion_matrix.png + misclassified.json
+.venv/bin/python evaluate.py                   # test eval; optional --out-dir (default "."); writes confusion_matrix.png + misclassified.json
 .venv/bin/python visualize_predictions.py      # writes correct/incorrect_predictions.png
+.venv/bin/python -m pytest tests/              # sanity tests (shape, splits, val determinism, checkpoint load)
 ```
 `train.py` argparse (defaults in `main()`): `--epochs 30`, `--batch-size 64`, `--lr 0.0008`,
-`--seed 42`, `--patience 12`. `evaluate.py` and `visualize_predictions.py` take no arguments.
+`--seed 42`, `--patience 12`. `evaluate.py` takes optional `--out-dir`. `visualize_predictions.py` takes no arguments.
+
+## Tuning knobs
+- `NUM_WORKERS` env var (default `16`): train-loader worker count in `data.py`.
+  Val/test loaders stay fixed at 4. Tested on this 16-core/32-thread box: no gain above 16
+  (24/32 slightly slower), see NOTES.md.
 
 ## Rules
 - Never change architecture, hyperparameters or augmentation without asking first,
@@ -33,3 +41,4 @@ All from the project root:
 - Use `tail -n 20` (or less) for logs and `head` for data files.
   Never print whole files or full training logs unless asked.
 - Commit after each working change with a descriptive message.
+  Before committing code changes, run `.venv/bin/python -m pytest tests/` and ensure it passes.

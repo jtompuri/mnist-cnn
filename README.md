@@ -31,6 +31,7 @@ python -m venv .venv
 
 MNIST data is downloaded automatically to `data/` on first run.
 Training runs on CUDA when available; `train.py` prints `Using device: cuda`.
+Train-loader worker count is tunable via the `NUM_WORKERS` env var (default 16).
 
 ## Usage
 
@@ -68,5 +69,6 @@ Outputs written to the project root:
 ## Notes
 
 - The model outputs `log_softmax`, so the loss is `nn.NLLLoss` (not `CrossEntropyLoss`).
-- Full design history and rejected alternatives (e.g. `torch.compile`, tested with
-  no speedup) are in `NOTES.md`.
+- Full design history and rejected alternatives (e.g. `torch.compile` with no speedup,
+  GPU-side augmentation with a quality cost, loader workers above 16 with no gain) are
+  in `NOTES.md`.

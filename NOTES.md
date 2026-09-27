@@ -15,6 +15,16 @@ help a GPU-consumption-bound pipeline, extra workers only add scheduler overhead
 Final committed model (nw=16 rerun): best val_loss 0.0141 @ ep27, test **99.64%** (36).
 Note: box is shared with Ollama; 16 is fine with current headroom but could contend under load.
 
+## 2026-09-27 — GPU augmentation investigated, NOT adopted (reverted)
+Implemented `augment_train()` in `data.py` (RandomRotation(8) + RandomAffine translate via
+`grid_sample` on CUDA, mirroring the CPU pipeline). A/B (same seed, same hyperparams, 30
+epochs): CPU aug best val_loss **0.0125** @ ep29, test **99.62%** (~155s total); GPU aug
+best val_loss **0.0242** @ ep29, test **99.30%** (~84s total). GPU side was ~2x faster per
+epoch but ~2px worse on the final test metric — an unexplained quality/speed trade-off, not
+just variance. Reverted to the CPU pipeline (quality kept, speed already covered by the
+worker-tuning entry below). If revisiting: ensure the warp distribution statistically
+matches torchvision's (p=0.5 skip probability) before re-adopting.
+
 ## 2026-09-27 — Train loader made data-loading-bound-friendly (nw=8, persistent, prefetch=4)
 Diagnosis: a bare pass over `train_loader` (no model, just moving 860 batches to GPU) ran
 6.22s vs a full epoch 6.29s → the data pass is ~99% of an epoch, i.e. training is
@@ -42,6 +52,10 @@ the GPU being shared with Ollama. Also verified: saving `compiled_model.state_di
 writes `_orig_mod.`-prefixed keys that a plain `MNISTNet.load_state_dict()` rejects,
 so integration would have required `_orig_mod`-safe checkpointing in train/eval/visualize.
 Decision (user-approved): do not integrate `torch.compile`; no code changes.
+Note: the "97% compute / 2.7% data" profile here was later shown to be a
+measurement artifact (Ollama contention + per-step syncs) — the nw=8 entry above
+found training was actually data-loading bound; the compile decision stands on the
+A/B speedup result (~no gain), independent of that profiling.
 
 ## 2026-09-27 — patience raised to 12 so cosine LR schedule runs its course (resolves open issue)
 Changed `train.py` default `--patience` from 5 to 12 (best-checkpoint selection still
