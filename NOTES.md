@@ -1,5 +1,12 @@
 # NOTES.md — decision log (newest first)
 
+## 2026-09-27 — DataLoader warnings on macOS (MPS) fixed
+- `pin_memory` was unconditionally `True`; MPS warns that pinned memory is not
+  supported. Now enabled only when `torch.cuda.is_available()`.
+- Worker counts (train `NUM_WORKERS` default 16, val/test 4) are clamped to
+  `os.process_cpu_count()` so a 12-worker Mac no longer exceeds torch's suggested
+  maximum. Both fixes were prompted by dataloader `UserWarning`s on a macOS run.
+
 ## 2026-09-27 — Generated outputs moved to a `results/` subfolder
 - All script outputs (training curves + CSV, confusion matrix + misclassified.json,
   prediction grids, feature figures) now default to `results/`; `--out-dir` still

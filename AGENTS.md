@@ -39,9 +39,10 @@ the feature figures (visualize_features.py). `--out-dir` overrides the directory
 Device selection (train/evaluate/visualize) comes from `utils.get_device()`: CUDA -> MPS -> CPU.
 
 ## Tuning knobs
-- `NUM_WORKERS` env var (default `16`): train-loader worker count in `data.py`.
-  Val/test loaders stay fixed at 4. Tested on this 16-core/32-thread box: no gain above 16
-  (24/32 slightly slower), see NOTES.md.
+- `NUM_WORKERS` env var (default `16`): train-loader worker count in `data.py`,
+  clamped to `os.process_cpu_count()`. Val/test loaders stay fixed at 4 (also clamped).
+  Tested on this 16-core/32-thread box: no gain above 16 (24/32 slightly slower),
+  see NOTES.md. `pin_memory` is only enabled when CUDA is available (avoids MPS warnings).
 
 ## Rules
 - Never change architecture, hyperparameters or augmentation without asking first,

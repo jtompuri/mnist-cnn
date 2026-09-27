@@ -5,6 +5,10 @@ from torch.utils.data import DataLoader, Subset
 from torchvision import datasets, transforms
 
 
+def _max_workers(configured: int) -> int:
+    return min(configured, os.process_cpu_count())
+
+
 def get_loaders(batch_size: int = 64, seed: int = 42) -> tuple[DataLoader, DataLoader, DataLoader]:
     # Train loader uses light data augmentation for better generalization.
     train_transform = transforms.Compose(
@@ -43,19 +47,30 @@ def get_loaders(batch_size: int = 64, seed: int = 42) -> tuple[DataLoader, DataL
     )
 
     train_num_workers = int(os.environ.get("NUM_WORKERS", "16"))
+    # pin_memory is only supported (and useful) on CUDA; enabling it on MPS/CPU
+    # emits warnings.
+    pin_memory = torch.cuda.is_available()
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
         shuffle=True,
-        num_workers=train_num_workers,
+        num_workers=_max_workers(train_num_workers),
         persistent_workers=True,
         prefetch_factor=4,
-        pin_memory=True,
+        pin_memory=pin_memory,
     )
     val_loader = DataLoader(
-        val_dataset, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True
+        val_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=_max_workers(4),
+        pin_memory=pin_memory,
     )
     test_loader = DataLoader(
-        test_dataset, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True
+        test_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=_max_workers(4),
+        pin_memory=pin_memory,
     )
     return train_loader, val_loader, test_loader
